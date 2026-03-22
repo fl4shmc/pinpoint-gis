@@ -6,5 +6,6 @@
     "verbatimModuleSyntax": false,
     "types": ["jest", "node", "@testing-library/jest-dom", "vite/client"]
   },
-  "include": ["src", "jest.setup.ts"]
+  "include": ["src", "test", "jest.setup.ts"],
+  "exclude": []
 }
