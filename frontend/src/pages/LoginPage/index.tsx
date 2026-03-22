@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { login } from "../../features/auth/authApi";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../features/auth/useAuth";
 import { useAuthFormSubmit } from "../../features/auth/hooks/useAuthFormSubmit";
 import { FormInput } from "../../components/shared/form";
 import "./LoginPage.css";

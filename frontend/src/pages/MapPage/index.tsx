@@ -6,7 +6,7 @@ import {
   useLocationSelection,
   useLocations,
 } from "../../features/locations/hooks";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../features/auth/useAuth";
 import "./MapPage.css";
 
 export function MapPage() {

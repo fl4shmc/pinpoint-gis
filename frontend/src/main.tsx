@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "leaflet/dist/leaflet.css";
 import "./index.css";
 import App from "./App.tsx";
-import { AuthProvider } from "./features/auth/AuthContext.tsx";
+import { AuthProvider } from "./features/auth/AuthProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

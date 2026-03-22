@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../features/auth/authApi";
-import { useAuth } from "../../features/auth/AuthContext";
+import { useAuth } from "../../features/auth/useAuth";
 import { useAuthFormSubmit } from "../../features/auth/hooks/useAuthFormSubmit";
 import { FormInput } from "../../components/shared/form";
 import "./RegisterPage.css";
