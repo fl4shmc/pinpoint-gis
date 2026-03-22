@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import L from "leaflet";
+import * as L from "leaflet";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import marker2x from "leaflet/dist/images/marker-icon-2x.png";
 import marker from "leaflet/dist/images/marker-icon.png";
