@@ -5,34 +5,46 @@ namespace PinpointGis.Api.Data;
 
 public static class DatabaseInitializationExtensions
 {
+    internal const int DefaultMaxAttempts = 10;
+    internal static readonly TimeSpan DefaultDelay = TimeSpan.FromSeconds(3);
+
     public static async Task InitializeDatabaseAsync(this WebApplication app, CancellationToken cancellationToken = default)
     {
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        await InitializeDatabaseWithRetryAsync(dbContext, cancellationToken);
+        await InitializeDatabaseWithRetryAsync(
+            dbContext,
+            cancellationToken,
+            DefaultMaxAttempts,
+            DefaultDelay,
+            SeedDataInitializer.InitializeAsync,
+            Task.Delay);
     }
 
-    private static async Task InitializeDatabaseWithRetryAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task InitializeDatabaseWithRetryAsync(
+        AppDbContext dbContext,
+        CancellationToken cancellationToken,
+        int maxAttempts,
+        TimeSpan delay,
+        Func<AppDbContext, Task> initializeAsync,
+        Func<TimeSpan, CancellationToken, Task> delayAsync)
     {
-        const int maxAttempts = 10;
-        var delay = TimeSpan.FromSeconds(3);
-
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
             try
             {
-                await SeedDataInitializer.InitializeAsync(dbContext);
+                await initializeAsync(dbContext);
                 return;
             }
             catch (Exception ex) when (attempt < maxAttempts && IsTransient(ex))
             {
-                await Task.Delay(delay, cancellationToken);
+                await delayAsync(delay, cancellationToken);
             }
         }
     }
 
-    private static bool IsTransient(Exception exception)
+    internal static bool IsTransient(Exception exception)
     {
         return exception switch
         {
