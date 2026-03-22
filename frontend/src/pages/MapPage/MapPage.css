@@ -1,0 +1,146 @@
+.map-page {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  align-items: start;
+}
+
+.sidebar,
+.details,
+.map-content {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.map-content {
+  height: 66vh;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+.location-list {
+  display: grid;
+  gap: 0.45rem;
+  max-height: calc(100vh - 250px);
+  overflow: auto;
+}
+
+.location-item {
+  background: #f8fafc;
+  color: #0f172a;
+  text-align: left;
+  border: 1px solid #cbd5e1;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.location-item.active {
+  border-color: #0f172a;
+}
+
+.map-shell {
+  height: 420px;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.map-form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  height: 100%;
+}
+
+.map-column,
+.form-column {
+  min-width: 0;
+}
+
+.map-column {
+  height: 100%;
+}
+
+.map-column .map-shell {
+  height: 100%;
+}
+
+.add-form {
+  margin: 0.75rem auto 0;
+  width: min(100%, 32rem);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.add-form input,
+.add-form textarea,
+.add-form select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.6rem;
+  font: inherit;
+}
+
+.add-form button {
+  justify-self: end;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.details-card {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 1100px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-content {
+    height: auto;
+  }
+
+  .map-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .location-list {
+    max-height: 220px;
+  }
+}

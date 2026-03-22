@@ -1,0 +1,50 @@
+services:
+  database:
+    image: postgis/postgis:15-3.3
+    container_name: pinpoint-gis-db
+    environment:
+      POSTGRES_DB: pinpoint_gis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pinpoint_gis"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend/PinpointGis.Api
+    container_name: pinpoint-gis-api
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: ${CONNECTIONSTRINGS__DEFAULTCONNECTION}
+      Jwt__Issuer: ${JWT__ISSUER:-PinpointGis}
+      Jwt__Audience: ${JWT__AUDIENCE:-PinpointGisClient}
+      Jwt__Key: ${JWT__KEY}
+      Jwt__ExpirationMinutes: ${JWT__EXPIRATIONMINUTES:-120}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/api
+    container_name: pinpoint-gis-web
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:
