@@ -36,16 +36,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("frontend", policy =>
-    {
-        policy.WithOrigins(
-                "http://localhost:3000")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -65,7 +55,10 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseCors("frontend");
+app.UseCors(policy =>
+    policy.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
