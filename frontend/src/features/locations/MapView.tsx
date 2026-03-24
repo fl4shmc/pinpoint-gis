@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as L from "leaflet";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import marker2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -32,11 +32,39 @@ function FlyToSelected({ location }: { location: LocationItem | null }) {
   return null;
 }
 
+function OpenPopupForSelected({
+  selectedLocationId,
+  markerRefs,
+}: {
+  selectedLocationId: number | null;
+  markerRefs: React.MutableRefObject<Record<number, L.Marker | null>>;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!selectedLocationId) {
+      map.closePopup();
+      return;
+    }
+
+    const marker = markerRefs.current[selectedLocationId];
+    if (!marker) {
+      return;
+    }
+
+    map.closePopup();
+    marker.openPopup();
+  }, [map, markerRefs, selectedLocationId]);
+
+  return null;
+}
+
 export function MapView({
   locations,
   selectedLocationId,
   onSelectLocation,
 }: MapViewProps) {
+  const markerRefs = useRef<Record<number, L.Marker | null>>({});
   const selectedLocation = useMemo(
     () =>
       locations.find((location) => location.id === selectedLocationId) ?? null,
@@ -56,9 +84,16 @@ export function MapView({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FlyToSelected location={selectedLocation} />
+        <OpenPopupForSelected
+          selectedLocationId={selectedLocationId}
+          markerRefs={markerRefs}
+        />
         {locations.map((location) => (
           <Marker
             key={location.id}
+            ref={(instance) => {
+              markerRefs.current[location.id] = instance;
+            }}
             position={[location.latitude, location.longitude]}
             eventHandlers={{ click: () => onSelectLocation(location) }}
           >
