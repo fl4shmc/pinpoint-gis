@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-ARG VITE_API_BASE_URL=http://localhost:8080/api
+ARG VITE_API_BASE_URL=https://backend-pinpoint-gis-a6bscjg8dfa6ahfr.southindia-01.azurewebsites.net/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 

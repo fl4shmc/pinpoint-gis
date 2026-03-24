@@ -11,6 +11,8 @@ using PinpointGis.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseUrls("http://0.0.0.0:80"); // Added to allow Azure to reach the backend
+
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
@@ -63,6 +65,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-await app.InitializeDatabaseAsync();
+// Initialize database without blocking app startup
+Task.Run(async () =>
+{
+    await app.InitializeDatabaseAsync();
+});
 
 app.Run();
