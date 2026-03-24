@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import {
-  createLocation,
-  fetchLocations,
-  setFavorite,
-} from "../locationsApi";
+import { useCallback, useState } from "react";
 import type { CreateLocationPayload, LocationItem } from "../locationTypes";
+import { useCreateLocation } from "./useCreateLocation";
+import { useLocationsQuery } from "./useLocationsQuery";
+import { useSelection } from "./useSelection";
+import { useToggleFavorite } from "./useToggleFavorite";
 
 interface UseLocationsResult {
   allLocations: LocationItem[];
@@ -19,63 +18,26 @@ interface UseLocationsResult {
 
 export function useLocations(): UseLocationsResult {
   const [allLocations, setAllLocations] = useState<LocationItem[]>([]);
-  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
-    null,
-  );
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { selectedLocationId, setSelectedLocationId } = useSelection();
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    void loadLocations();
-  }, []);
-
-  async function loadLocations() {
-    setLoading(true);
-    setError("");
-
-    try {
-      const data = await fetchLocations();
-      setAllLocations(data);
-      if (data.length > 0) {
-        setSelectedLocationId(data[0].id);
+  const handleLoaded = useCallback(
+    (locations: LocationItem[]) => {
+      setAllLocations(locations);
+      if (locations.length > 0) {
+        setSelectedLocationId(locations[0].id);
       }
-    } catch {
-      setError("Failed to load locations.");
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+    [setSelectedLocationId],
+  );
 
-  async function handleCreate(payload: CreateLocationPayload) {
-    setSaving(true);
-    setError("");
-
-    try {
-      const created = await createLocation(payload);
-      setAllLocations((old) => [created, ...old]);
-      setSelectedLocationId(created.id);
-    } catch {
-      setError("Failed to create location.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleToggleFavorite(location: LocationItem) {
-    const next = !location.isFavorite;
-
-    try {
-      await setFavorite(location.id, next);
-      setAllLocations((old) =>
-        old.map((item) =>
-          item.id === location.id ? { ...item, isFavorite: next } : item,
-        ),
-      );
-    } catch {
-      setError("Failed to update favorite status.");
-    }
-  }
+  const { loading } = useLocationsQuery({ onLoaded: handleLoaded, setError });
+  const { saving, handleCreate } = useCreateLocation({
+    setAllLocations,
+    setSelectedLocationId,
+    setError,
+  });
+  const { handleToggleFavorite } = useToggleFavorite({ setAllLocations, setError });
 
   return {
     allLocations,

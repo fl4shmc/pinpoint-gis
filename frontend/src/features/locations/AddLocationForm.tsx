@@ -24,6 +24,13 @@ export function AddLocationForm({ onCreate }: AddLocationFormProps) {
   const [form, setForm] = useState<CreateLocationPayload>(initialState);
   const [saving, setSaving] = useState(false);
 
+  function updateField<K extends keyof CreateLocationPayload>(
+    key: K,
+    value: CreateLocationPayload[K],
+  ) {
+    setForm((old) => ({ ...old, [key]: value }));
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
@@ -43,17 +50,13 @@ export function AddLocationForm({ onCreate }: AddLocationFormProps) {
         required
         value={form.name}
         placeholder="Name"
-        onChange={(event) =>
-          setForm((old) => ({ ...old, name: event.target.value }))
-        }
+        onChange={(event) => updateField("name", event.target.value)}
       />
       <textarea
         required
         value={form.description}
         placeholder="Description"
-        onChange={(event) =>
-          setForm((old) => ({ ...old, description: event.target.value }))
-        }
+        onChange={(event) => updateField("description", event.target.value)}
       />
       <div className="inline-fields">
         <input
@@ -63,7 +66,7 @@ export function AddLocationForm({ onCreate }: AddLocationFormProps) {
           value={form.latitude}
           placeholder="Latitude"
           onChange={(event) =>
-            setForm((old) => ({ ...old, latitude: Number(event.target.value) }))
+            updateField("latitude", Number(event.target.value))
           }
         />
         <input
@@ -73,10 +76,7 @@ export function AddLocationForm({ onCreate }: AddLocationFormProps) {
           value={form.longitude}
           placeholder="Longitude"
           onChange={(event) =>
-            setForm((old) => ({
-              ...old,
-              longitude: Number(event.target.value),
-            }))
+            updateField("longitude", Number(event.target.value))
           }
         />
       </div>
@@ -84,10 +84,7 @@ export function AddLocationForm({ onCreate }: AddLocationFormProps) {
         <select
           value={form.category}
           onChange={(event) =>
-            setForm((old) => ({
-              ...old,
-              category: event.target.value as LocationCategory,
-            }))
+            updateField("category", event.target.value as LocationCategory)
           }
         >
           {LOCATION_CATEGORIES.map((category) => (
@@ -99,10 +96,7 @@ export function AddLocationForm({ onCreate }: AddLocationFormProps) {
         <select
           value={form.status}
           onChange={(event) =>
-            setForm((old) => ({
-              ...old,
-              status: event.target.value as LocationStatus,
-            }))
+            updateField("status", event.target.value as LocationStatus)
           }
         >
           {LOCATION_STATUSES.map((status) => (
