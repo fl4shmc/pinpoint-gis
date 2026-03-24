@@ -12,7 +12,7 @@ public sealed class AuthService(
 {
     public async Task<AuthResponse?> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetByEmailAsync(request.Email.Trim().ToLowerInvariant(), cancellationToken);
+        var user = await userRepository.GetByEmailAsync(NormalizeEmail(request.Email), cancellationToken);
         if (user is null || !user.IsActive)
         {
             return null;
@@ -24,19 +24,13 @@ public sealed class AuthService(
             return null;
         }
 
-        var tokenResult = jwtTokenService.GenerateToken(user.Id, user.Email);
-        return new AuthResponse
-        {
-            Token = tokenResult.Token,
-            ExpiresAtUtc = tokenResult.ExpiresAtUtc,
-            Email = user.Email
-        };
+        return CreateAuthResponse(user);
     }
 
     public async Task<AuthResponse?> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken)
     {
-        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var normalizedUsername = request.Username.Trim().ToLowerInvariant();
+        var normalizedEmail = NormalizeEmail(request.Email);
+        var normalizedUsername = NormalizeUsername(request.Username);
 
         var existingByEmail = await userRepository.GetByEmailAsync(normalizedEmail, cancellationToken);
         if (existingByEmail is not null)
@@ -60,12 +54,27 @@ public sealed class AuthService(
         user.PasswordHash = passwordHasher.HashPassword(user, request.Password);
         var created = await userRepository.AddAsync(user, cancellationToken);
 
-        var tokenResult = jwtTokenService.GenerateToken(created.Id, created.Email);
+        return CreateAuthResponse(created);
+    }
+
+    private static string NormalizeEmail(string email)
+    {
+        return email.Trim().ToLowerInvariant();
+    }
+
+    private static string NormalizeUsername(string username)
+    {
+        return username.Trim().ToLowerInvariant();
+    }
+
+    private AuthResponse CreateAuthResponse(UserAccount user)
+    {
+        var tokenResult = jwtTokenService.GenerateToken(user.Id, user.Email);
         return new AuthResponse
         {
             Token = tokenResult.Token,
             ExpiresAtUtc = tokenResult.ExpiresAtUtc,
-            Email = created.Email
+            Email = user.Email
         };
     }
 }

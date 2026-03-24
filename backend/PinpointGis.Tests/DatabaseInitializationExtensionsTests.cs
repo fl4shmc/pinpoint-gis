@@ -18,7 +18,7 @@ public sealed class DatabaseInitializationExtensionsTests
             CancellationToken.None,
             maxAttempts: 5,
             delay: TimeSpan.Zero,
-            initializeAsync: _ =>
+            initializeAsync: (_, _) =>
             {
                 attempts++;
                 if (attempts < 3)
@@ -51,7 +51,7 @@ public sealed class DatabaseInitializationExtensionsTests
                 CancellationToken.None,
                 maxAttempts: 5,
                 delay: TimeSpan.Zero,
-                initializeAsync: _ =>
+                initializeAsync: (_, _) =>
                 {
                     attempts++;
                     throw new InvalidOperationException("Non transient");
@@ -79,7 +79,7 @@ public sealed class DatabaseInitializationExtensionsTests
                 CancellationToken.None,
                 maxAttempts: 3,
                 delay: TimeSpan.Zero,
-                initializeAsync: _ =>
+                initializeAsync: (_, _) =>
                 {
                     attempts++;
                     throw new TimeoutException("Transient");

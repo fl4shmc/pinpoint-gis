@@ -12,13 +12,14 @@ public static class DatabaseInitializationExtensions
     {
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var databaseInitializer = scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>();
 
         await InitializeDatabaseWithRetryAsync(
             dbContext,
             cancellationToken,
             DefaultMaxAttempts,
             DefaultDelay,
-            SeedDataInitializer.InitializeAsync,
+            databaseInitializer.InitializeAsync,
             Task.Delay);
     }
 
@@ -27,14 +28,14 @@ public static class DatabaseInitializationExtensions
         CancellationToken cancellationToken,
         int maxAttempts,
         TimeSpan delay,
-        Func<AppDbContext, Task> initializeAsync,
+        Func<AppDbContext, CancellationToken, Task> initializeAsync,
         Func<TimeSpan, CancellationToken, Task> delayAsync)
     {
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
             try
             {
-                await initializeAsync(dbContext);
+                await initializeAsync(dbContext, cancellationToken);
                 return;
             }
             catch (Exception ex) when (attempt < maxAttempts && IsTransient(ex))

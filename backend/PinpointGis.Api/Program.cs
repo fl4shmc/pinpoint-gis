@@ -47,6 +47,9 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IPasswordHasher<UserAccount>, PasswordHasher<UserAccount>>();
+builder.Services.AddScoped<IMigrationBaselineService, MigrationBaselineService>();
+builder.Services.AddScoped<ILocationSeedService, LocationSeedService>();
+builder.Services.AddScoped<IDatabaseInitializer, SeedDataInitializer>();
 
 var app = builder.Build();
 
