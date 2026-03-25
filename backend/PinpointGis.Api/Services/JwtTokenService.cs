@@ -20,6 +20,8 @@ public sealed class JwtTokenService(IOptions<JwtOptions> jwtOptions) : IJwtToken
 
         var claims = new[]
         {
+            // We set both JWT-standard claims and ClaimTypes claims.
+            // This keeps user identity lookup consistent across token readers and ASP.NET helpers.
             new Claim(JwtRegisteredClaimNames.Sub, userId),
             new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(ClaimTypes.NameIdentifier, userId),

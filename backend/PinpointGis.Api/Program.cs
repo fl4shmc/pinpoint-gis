@@ -58,6 +58,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Deliberately kept all origins allowedfor local development.
 app.UseCors(policy =>
     policy.AllowAnyOrigin()
         .AllowAnyHeader()

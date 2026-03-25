@@ -31,6 +31,9 @@ public static class DatabaseInitializationExtensions
         Func<AppDbContext, CancellationToken, Task> initializeAsync,
         Func<TimeSpan, CancellationToken, Task> delayAsync)
     {
+        // In Docker, the API can start before PostgreSQL is ready.
+        // We retry temporary database failures a few times to give Postgres time to come up.
+        // On the last attempt we stop retrying and let startup fail with the real error.
         for (var attempt = 1; attempt <= maxAttempts; attempt++)
         {
             try
@@ -47,6 +50,8 @@ public static class DatabaseInitializationExtensions
 
     internal static bool IsTransient(Exception exception)
     {
+        // Only treat likely temporary failures as retryable.
+        // Non-transient errors should fail immediately so we don't hide real issues.
         return exception switch
         {
             TimeoutException => true,

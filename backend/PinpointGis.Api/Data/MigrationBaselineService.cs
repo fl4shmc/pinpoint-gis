@@ -4,6 +4,11 @@ namespace PinpointGis.Api.Data;
 
 public sealed class MigrationBaselineService : IMigrationBaselineService
 {
+    /// <summary>
+    /// Handles old databases that were created before EF migrations were used.
+    /// If the core tables already exist but migration history is empty, this method records
+    /// the first migration so EF can continue with normal migrations safely.
+    /// </summary>
     public async Task EnsureMigrationBaselineForLegacyDatabaseAsync(AppDbContext dbContext, CancellationToken cancellationToken)
     {
         var appliedMigrations = await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken);
@@ -28,6 +33,8 @@ public sealed class MigrationBaselineService : IMigrationBaselineService
         }
 
         var productVersion = dbContext.Model.GetProductVersion();
+        // This SQL mirrors EF's migration history table shape.
+        // If EF changes that table format in future upgrades, update this block as well.
         await dbContext.Database.ExecuteSqlInterpolatedAsync($@"
             CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
                 ""MigrationId"" character varying(150) NOT NULL,

@@ -37,6 +37,7 @@ export function useLocationSelection({
 
   const selectedLocation = useMemo(
     () =>
+      // If filters hide the selected item, keep it selected so the details panel does not suddenly clear.
       filteredLocations.find((location) => location.id === selectedLocationId) ??
       allLocations.find((location) => location.id === selectedLocationId) ??
       null,

@@ -6,6 +6,8 @@ import marker from "leaflet/dist/images/marker-icon.png";
 import shadow from "leaflet/dist/images/marker-shadow.png";
 import type { LocationItem } from "./locationTypes";
 
+// Leaflet expects marker image files at default paths.
+// With bundlers, those paths are different, so we set them here explicitly.
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: marker2x,
   iconUrl: marker,
@@ -52,6 +54,7 @@ function OpenPopupForSelected({
       return;
     }
 
+    // Close any open popup first to avoid stale or duplicate popups during selection changes.
     map.closePopup();
     marker.openPopup();
   }, [map, markerRefs, selectedLocationId]);
